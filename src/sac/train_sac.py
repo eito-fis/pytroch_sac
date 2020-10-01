@@ -25,7 +25,8 @@ def main(args,
          critic_fc=(256, 256),
          conv_size=None,
          logging_period=25,
-         checkpoint_period=5000):
+         checkpoint_period=5000,
+         gpu=False):
 
     if args.wandb:
         import wandb
@@ -58,11 +59,12 @@ def main(args,
     if args.render:
         env.render()
 
-    if torch.cuda.is_available():  
+    if torch.cuda.is_available() and args.gpu:  
         device = "cuda:0"
-    else:  
+    else:
+        if args.gpu:
+            print("GPU flag set, but no GPU found! Using CPU.")
         device = "cpu"
-    # device = "cpu"
 
     print("Building agent...")
     agent = SACAgent(train_steps=train_steps,
@@ -119,6 +121,10 @@ if __name__ == '__main__':
     # Run mode arguments
     parser.add_argument(
         '--render',
+        default=False,
+        action='store_true')
+    parser.add_argument(
+        '--gpu',
         default=False,
         action='store_true')
 
