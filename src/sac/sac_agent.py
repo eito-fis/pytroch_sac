@@ -149,6 +149,14 @@ class SACAgent():
                         break
                     self.update(i, g, done)
 
+            # Periodically save models
+            if i % self.checkpoint_period == 0 and i != 0:
+                self.actor.save(f"actor_model_{i}", self.checkpoint_dir)
+                self.q1.save(f"q1_model_{i}", self.checkpoint_dir)
+                self.q2.save(f"q2_model_{i}", self.checkpoint_dir)
+                self.q1_t.save(f"q1_t_model_{i}", self.checkpoint_dir)
+                self.q2_t.save(f"q2_t_model_{i}", self.checkpoint_dir)
+
     def update(self, i, g, done, reward_scale=10):
         """
         Samples from the replay buffer and updates the model
@@ -258,15 +266,6 @@ class SACAgent():
                             "Q1 Loss": q1_loss.detach().cpu().numpy(),
                             "Q2 Loss": q2_loss.detach().cpu().numpy(),
                             "Alpha": self.alpha.detach().cpu().numpy()})
-
-        # Periodically save all models
-        if i % self.checkpoint_period == 0 and i != 0:
-            self.actor.save(f"actor_model_{i}", self.checkpoint_dir)
-            self.q1.save(f"q1_model_{i}", self.checkpoint_dir)
-            self.q2.save(f"q2_model_{i}", self.checkpoint_dir)
-            self.q1_t.save(f"q1_t_model_{i}", self.checkpoint_dir)
-            self.q2_t.save(f"q2_t_model_{i}", self.checkpoint_dir)
-
 
 
 if __name__ == "__main__":
